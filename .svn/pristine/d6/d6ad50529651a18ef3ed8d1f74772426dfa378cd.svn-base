@@ -1,0 +1,42 @@
+<script type="text/javascript" src="https://ssl.gstatic.com/trends_nrtr/1064_RC03/embed_loader.js"></script>
+<script type="text/javascript" src="jquery-1.12.4.min.js"></script>
+<!--Googlge Trends Intrest Over Time and Geo Locations-->
+<!--Alexa Rank and related seardhes-->
+
+<body>
+<script>
+	var urlNew = localStorage.getItem('urlNew1');
+	var allUrls;
+	 $.get("embededGoogleTrendsData.php", function(data){
+		allUrls = data.trim();
+		allUrls = JSON.parse(allUrls);
+		var urlNew2 = localStorage.getItem('urlNew2');
+		if(urlNew2 != null){
+			var urlNew2 = urlNew2.replace('www.', '');
+		}
+		
+		
+		//Checks if new url is not same and second comparision url not null then insert new object in array of objects
+		if(urlNew2 != null && urlNew2 != 'null'  && urlNew2 != urlNew){
+			var newval = '{"keyword":"'+urlNew2+'","geo":"","time":"today 5-y"}';
+			newval = JSON.parse(newval);
+			allUrls[1] = newval;			
+		}
+		
+		//embede google trends iframes takes urls dynamically
+		if(allUrls){
+			var embededUrls = {"comparisonItem": allUrls,"category":0,"property":""};
+		    trends.embed.renderExploreWidget("TIMESERIES", embededUrls, {"exploreQuery":"date=today%203-m&q=popchartlab.com,littlesparrowtea.com","guestPath":"https://trends.google.com:443/trends/embed/"});
+		    //trends.embed.renderExploreWidget("TIMESERIES", {"comparisonItem":[{"keyword":"popchartlab.com","geo":"PK","time":"today 3-m"}],"category":0,"property":"youtube"}, {"exploreQuery":"date=today%203-m&geo=PK&gprop=youtube&q=facebook.com","guestPath":"https://trends.google.com:443/trends/embed/"});
+		    //trends.embed.renderExploreWidget("GEO_MAP", {"comparisonItem":[{"keyword":"popchartlab.com","geo":"","time":"today 3-m"},{"keyword":"twitter.com","geo":"","time":"today 3-m"},{"keyword":"youtube.com","geo":"","time":"today 3-m"},{"keyword":"yahoo.com","geo":"","time":"today 3-m"}],"category":0,"property":""}, {"exploreQuery":"date=today%203-m&q=facebook.com","guestPath":"https://trends.google.com:443/trends/embed/"});
+		    trends.embed.renderExploreWidget("GEO_MAP", embededUrls, {"exploreQuery":"date=today%203-m&q=facebook.com","guestPath":"https://trends.google.com:443/trends/embed/"});
+		  	
+		}
+		
+	}); 
+</script>
+</body>
+
+
+
+

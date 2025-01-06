@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Shopify Extention</title>
+		<style>
+			.glyphicon-refresh-animate {
+			    -animation: spin .7s infinite linear;
+			    -webkit-animation: spin2 .7s infinite linear;
+			}
+			@-webkit-keyframes spin2 {
+			    from { -webkit-transform: rotate(0deg);}
+			    to { -webkit-transform: rotate(360deg);}
+			}
+			@keyframes spin {
+			    from { transform: scale(1) rotate(0deg);}
+			    to { transform: scale(1) rotate(360deg);}
+			}
+
+		</style>
+			
+		<script type="text/javascript" src="jquery/jquery-1.12.4.min.js"></script>
+		
+		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.1.1/js/dataTables.responsive.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.1.1/js/responsive.bootstrap.min.js"></script>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"  type="text/css"/>
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css"  type="text/css"/>
+		<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.bootstrap.min.css"  type="text/css"/>
+ 
+	</head>
+	<body>
+		<div class="row col-sm-12">
+			<ul class="nav nav-pills" role="tablist">
+			  <li role="presentation" class=""><a href="#" target="_blank" title="Full Page View"><span class="label label-primary">Page View</span> </a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-success">Web Url</span> <span class="badge" id="url">example.com</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-success">Country</span> <span class="badge" id="country_name">Country</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-success">Country Rank</span> <span class="badge" id="country_rank">0</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-success">Rank</span> <span class="badge" id="alexa_rank">0</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-warning">Estimated Approximate Visitors</span> <span class="badge" id="visitors">0</span></a></li>
+			  <li role="presentation" class=""><a href="shopify_products_test.html" target="_blank" title="Click to view all products"><span class="label label-info">Products</span> <span class="badge" id="count">0</span></a></li>
+			  <li role="presentation" class=""><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Load More <span class="caret"></span></a>
+			      <ul class="dropdown-menu">
+					<li>
+						<div style="width: 250px; padding: 10px;" id="extra_info">
+							<label id="refresh-icon-extra" style="display: none;" class="glyphicon glyphicon-refresh"></label>
+							<div style="width: 100%;" id="show_extra_info"></div>
+						</div>									
+					</li>
+				  </ul>
+			  </li>
+			</ul>
+			  <div class="col-lg-6">
+				<form name="new_search" id="new_search">
+				    <div class="input-group">
+				      <input type="text" class="form-control" name="newUrl" id="newUrl" placeholder="example.com">
+				      <span class="input-group-btn">
+				        <button class="btn btn-default" type="button" id="newUrlButton">Compare With Url</button>
+				      </span>
+				      <span class="input-group-btn">
+				        <button class="btn btn-default" id="refresh" type="button"><label id="refresh-icon" class="glyphicon glyphicon-refresh"></label></button>
+				      </span>
+				    </div><!-- /input-group -->
+				</form>
+			  </div><!-- /.col-lg-6 -->
+		</div>
+		<iframe id="googleTrendFrame" src="embededGoogleTrends2.html" width="100%" frameborder="0" scrolling="0" style="margin-top:100px; height: 850px;"></iframe>
+		
+		<!--Shopify products in detail-->	
+	</body>
+</html>
+
+<script>
+	
+
+	$("#refresh").click(function(){
+		localStorage.setItem('urlNew2','null');
+		location.reload();
+		
+	});		
+	
+	//This is the initial url of the domain where the extention first time starts
+	var url = 'popchartlab.com';
+	
+	//Compare new urls on click and extract domain parts from the provided urls
+	$('#newUrlButton').click(function(){
+			url = $("#newUrl").val();
+			
+			if (/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(url)){
+				//if the given url is a domain name First Part: checks if the url is a domain and Second Part: extract domain if not provided
+				totalProducts(url);
+				getAlexaInfo(url, 'compare_url');
+				extraAlexaInfo(url);
+				localStorage.setItem('urlNew2',url);
+			 }/*else if(url.match(/^([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/)){
+			 	alert('Please enter a domain name or valid url');
+			 }*/else if(url.match(/^((http[s]?|https|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/) || url.match(/^((http|https|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)?$/) || url.match(/^([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/)){
+				// if any type of url including protocoles, paths, subdomains, hashes, slashes and dots etc.
+				var domainName = parseURL(url);
+				url = domainName.domain;
+				totalProducts(url);
+				getAlexaInfo(url, 'compare_url');
+				extraAlexaInfo(url);
+				localStorage.setItem('urlNew2',url);				
+				console.log('domain name:',url);			 	
+			 }else if(url.match(/^([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/)){
+			 	alert('Please enter a domain name or valid url');
+			 }else
+			 {
+				alert("Please enter a domain name or valid url");
+				return false;
+			}		
+		
+	})
+	
+	//Initially loaded functions when window loads
+	getAlexaInfo(url);
+	extraAlexaInfo(url);
+	totalProducts(url);
+	
+	//Basic Aexa information like alexa rank and country
+	function getAlexaInfo(url, compare){
+		$('#refresh-icon').addClass('glyphicon-refresh-animate');
+		
+		$.post("alexa_rank_info.php", { url: url, time: "2pm" } , function(data){
+			var alexaInfo;
+			alexainfo = data.trim();
+			if(!alexainfo){
+				alert("Alexa Rank Info not Exists for this url");
+			}else{
+				alexainfo = JSON.parse(alexainfo);
+				$('#country_name').html(alexainfo.country_name[0]);
+				$('#country_code').html(alexainfo.country_code[0]);
+				$('#alexa_rank').html(alexainfo.rank[0]);
+				$('#country_rank').html(alexainfo.country_rank[0]);
+				$('#url').html(alexainfo.url);
+				$('#visitors').html(alexainfo.visitors);
+				$('#show_extra_info').html(alexainfo.extra_site_info);
+				$('#refresh-icon').removeClass('glyphicon-refresh-animate');
+			}
+
+		});
+		if(compare != 'compare_url'){
+			localStorage.setItem('urlNew1',url);
+		}
+		var urltest = $("#newUrl").val();
+		if(urltest != ''){
+			$('iframe').each(function() {
+			  this.contentWindow.location.reload(true);
+			});			
+		}
+	}	
+	
+	//extra info from Alexa and seo reports
+	function extraAlexaInfo(url){
+		$('#refresh-icon-extra').show();
+		$('#refresh-icon-extra').addClass('glyphicon-refresh-animate');
+		$.post("extra_alexa_rank_info.php", { url: url, time: "2pm" } , function(data){
+			var alexaInfo;
+			alexainfo = data.trim();
+			alexainfo = JSON.parse(alexainfo);
+			$('#show_extra_info').html(alexainfo.extra_site_info);
+			$('#refresh-icon-extra').removeClass('glyphicon-refresh-animate');
+			$('#refresh-icon-extra').hide();
+		});
+	}	
+	
+	//If the the web is the shopify shop then return products
+	function totalProducts(url){
+		urlJson = "https://" + url+"/products.json?limit=1000000";
+		$.ajax({
+    		url: urlJson,
+    		type: 'GET',
+    		beforeSend: function() {
+        	// TODO: show your spinner
+        	$('#ajaxSpinner').show();
+    	},
+    		complete: function() {
+        		// TODO: hide your spinner
+        		$('#ajaxSpinner').hide();
+    		},
+    		success: function(data) {
+    			//console.log(data);
+		        var products = data.products;
+		        $("#CountDiv").show();
+		        $("#count").html(products.length);
+    		},
+		    error: function (xhr, ajaxOptions, thrownError) {
+		    	$("#count").html('0');
+		    	alert("This url not pointing to Shopify");
+		    }
+		});
+		
+	}	
+	
+	//Extracting domain parts from a given url
+	function parseURL(url){
+	    parsed_url = {}
+	    if ( url == null || url.length == 0 )
+	        return parsed_url;
+
+	    protocol_i = url.indexOf('://');
+	    parsed_url.protocol = url.substr(0,protocol_i);
+		
+
+		if(protocol_i == -1){
+			remaining_url = url;
+		}else{
+			remaining_url = url.substr(protocol_i + 3, url.length);
+		}
+		console.log(protocol_i);
+		console.log(remaining_url);	    
+	    domain_i = remaining_url.indexOf('/');
+	    if(domain_i == -1){
+		    domain_i = domain_i == -1 ? remaining_url.length : domain_i;			
+		}else{
+			domain_i = domain_i == -1 ? remaining_url.length - 1 : domain_i;
+		}
+	    //domain_i = domain_i == -1 ? remaining_url.length - 1 : domain_i;
+	    parsed_url.domain = remaining_url.substr(0, domain_i);
+	    parsed_url.path = domain_i == -1 || domain_i + 1 == remaining_url.length ? null : remaining_url.substr(domain_i + 1, remaining_url.length);
+
+	    domain_parts = parsed_url.domain.split('.');
+	    switch ( domain_parts.length ){
+	        case 2:
+	          parsed_url.subdomain = null;
+	          parsed_url.host = domain_parts[0];
+	          parsed_url.tld = domain_parts[1];
+	          break;
+	        case 3:
+	          parsed_url.subdomain = domain_parts[0];
+	          parsed_url.host = domain_parts[1];
+	          parsed_url.tld = domain_parts[2];
+	          break;
+	        case 4:
+	          parsed_url.subdomain = domain_parts[0];
+	          parsed_url.host = domain_parts[1];
+	          parsed_url.tld = domain_parts[2] + '.' + domain_parts[3];
+	          break;
+	    }
+	    parsed_url.parent_domain = parsed_url.host + '.' + parsed_url.tld;
+	    return parsed_url;
+	}
+	
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Shopify Extention</title>
+		<style>
+			.glyphicon-refresh-animate {
+			    -animation: spin .7s infinite linear;
+			    -webkit-animation: spin2 .7s infinite linear;
+			}
+			@-webkit-keyframes spin2 {
+			    from { -webkit-transform: rotate(0deg);}
+			    to { -webkit-transform: rotate(360deg);}
+			}
+			@keyframes spin {
+			    from { transform: scale(1) rotate(0deg);}
+			    to { transform: scale(1) rotate(360deg);}
+			}
+
+		</style>
+			
+		<script type="text/javascript" src="jquery-1.12.4.min.js"></script>
+		
+		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.1.1/js/dataTables.responsive.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.1.1/js/responsive.bootstrap.min.js"></script>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"  type="text/css"/>
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css"  type="text/css"/>
+		<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.bootstrap.min.css"  type="text/css"/>
+ 
+	</head>
+	<body>
+		<div class="row col-sm-12">
+			<ul class="nav nav-pills" role="tablist">
+			  <li role="presentation" class=""><a href="shopify_extention.html" title="Back To Full Page View"><span class="label label-primary">Main View</span> </a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-success">Web Url</span> <span class="badge" id="url">example.com</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-success">Country</span> <span class="badge" id="country_name">Country</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-success">Country Rank</span> <span class="badge" id="country_rank">0</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-success">Rank</span> <span class="badge" id="alexa_rank">0</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-warning">Estimated Approximate Visitors</span> <span class="badge" id="visitors">0</span></a></li>
+			  <li role="presentation" class=""><a href="#"><span class="label label-info">Products</span> <span class="badge" id="count">0</span></a></li>
+			  <li role="presentation" class=""><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Load More <span class="caret"></span></a>
+			      <ul class="dropdown-menu">
+					<li>
+						<div style="width: 250px; padding: 10px;" id="extra_info">
+							<label id="refresh-icon-extra" style="display: none;" class="glyphicon glyphicon-refresh"></label>
+							<div style="width: 100%;" id="show_extra_info"></div>
+						</div>									
+					</li>
+				  </ul>
+			  </li>
+			</ul>
+			  <!--<div class="col-lg-6">
+				<form name="new_search" id="new_search">
+				    <div class="input-group">
+				      <input type="text" class="form-control" name="newUrl" id="newUrl" placeholder="example.com">
+				      <span class="input-group-btn">
+				        <button class="btn btn-default" type="button" id="newUrlButton">Compare With Url</button>
+				      </span>
+				      <span class="input-group-btn">
+				        <button class="btn btn-default" id="refresh" type="button"><label id="refresh-icon" class="glyphicon glyphicon-refresh"></label></button>
+				      </span>
+				    </div>
+				</form>
+			  </div>-->
+		</div>		
+		<!--Shopify products in detail-->
+		<br />
+		<div class="col-sm-12"><hr /></div>
+		<div class="col-sm-12"><button class="btn btn-default" id="refresh" type="button"><label id="refresh-icon" class="glyphicon glyphicon-refresh"></label></button></div>
+		<div class="col-sm-12">
+				<table id="example" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+			        <thead>
+			            <tr>
+			                <th>Title</th>
+			                <th>Product Type</th>
+			                <th>Price</th>
+						    <th>Options</th>
+						    <th>SKU</th>
+			                <th>Vendor</th>
+                			<th>Created At</th>
+			                <th>Description</th>
+			                <th>Images</th>
+			                <!--<th>Variants</th>
+			                <th>Options</th>-->
+			            </tr>
+			        </thead>
+			        <!--<tbody></tbody>-->
+			        <tfoot>
+			            <tr>
+			                <th>Title</th>
+			                <th>Product Type</th>
+			                <th>Price</th>
+						    <th>Options</th>
+						    <th>SKU</th>
+			                <th>Vendor</th>
+                			<th>Created At</th>
+			                <th>Description</th>
+			                <th>Images</th>
+			                <!--<th>Variants</th>
+			                <th>Options</th>-->
+			            </tr>
+			        </tfoot>
+				    </table>
+			</div>
+	
+	</body>
+</html>
+
+<script>
+	
+
+	$("#refresh").click(function(){
+		location.reload();
+	});		
+	
+	//This is the initial url of the domain where the extention first time starts
+	var url = localStorage.getItem('urlNew1');
+	var urlNew2 = localStorage.getItem('urlNew2');
+	if(urlNew2!=null && urlNew2 != 'null' && urlNew2!='' && urlNew2 != url){
+		var productUrl = urlNew2;
+	}else{
+		productUrl = url;
+	}
+	//Compare new urls on click and extract domain parts from the provided urls
+	$('#newUrlButton').click(function(){
+			url = $("#newUrl").val();
+			
+			if (/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(url)){
+				//if the given url is a domain name First Part: checks if the url is a domain and Second Part: extract domain if not provided
+				totalProducts(url);
+				getAlexaInfo(url, 'compare_url');
+				extraAlexaInfo(url);
+				localStorage.setItem('urlNew2',url);
+			 }else if(url.match(/^([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/)){
+			 	alert('Enter Valid Domain Name');
+			 }else if(url.match(/^((http[s]?|https|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/) || url.match(/^((http[s]?|https|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)?$/)){
+				// if any type of url including protocoles, paths, subdomains, hashes, slashes and dots etc.
+				var domainName = parseURL(url);
+				url = domainName.domain;
+				totalProducts(url);
+				getAlexaInfo(url, 'compare_url');
+				extraAlexaInfo(url);
+				localStorage.setItem('urlNew2',url);				
+				console.log('domain name:',url);			 	
+			 }else if(url.match(/^([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/)){
+			 	alert('Enter Valid Domain Name');
+			 }else
+			 {
+				alert("Enter Valid Domain Name");
+				return false;
+			}		
+		
+	})
+	
+	//Initially loaded functions when window loads
+	getAlexaInfo(productUrl);
+	extraAlexaInfo(productUrl);
+	totalProducts(productUrl);
+	
+	//Basic Aexa information like alexa rank and country
+	function getAlexaInfo(url, compare){
+		$('#refresh-icon').addClass('glyphicon-refresh-animate');
+		
+		$.post("alexa_rank_info.php", { url: url, time: "2pm" } , function(data){
+			var alexaInfo;
+			alexainfo = data.trim();
+			alexainfo = JSON.parse(alexainfo);
+			
+			$('#country_name').html(alexainfo.country_name[0]);
+			$('#country_code').html(alexainfo.country_code[0]);
+			$('#alexa_rank').html(alexainfo.rank[0]);
+			$('#country_rank').html(alexainfo.country_rank[0]);
+			$('#url').html(alexainfo.url);
+			$('#visitors').html(alexainfo.visitors);
+			$('#show_extra_info').html(alexainfo.extra_site_info);
+			$('#refresh-icon').removeClass('glyphicon-refresh-animate');
+		});
+		if(compare != 'compare_url'){
+			localStorage.setItem('urlNew1',url);
+		}
+		var urltest = $("#newUrl").val();
+		if(urltest != ''){
+			$('iframe').each(function() {
+			  this.contentWindow.location.reload(true);
+			});			
+		}
+	}	
+	
+	//extra info from Alexa and seo reports
+	function extraAlexaInfo(url){
+		$('#refresh-icon-extra').show();
+		$('#refresh-icon-extra').addClass('glyphicon-refresh-animate');
+		$.post("extra_alexa_rank_info.php", { url: url, time: "2pm" } , function(data){
+			var alexaInfo;
+			alexainfo = data.trim();
+			alexainfo = JSON.parse(alexainfo);
+			$('#show_extra_info').html(alexainfo.extra_site_info);
+			$('#refresh-icon-extra').removeClass('glyphicon-refresh-animate');
+			$('#refresh-icon-extra').hide();
+		});
+	}	
+	
+	//If the the web is the shopify shop then return products
+	function totalProducts(url){
+		urlJson = "https://" + url+"/products.json?limit=1000000";
+		$.ajax({
+    		url: urlJson,
+    		type: 'GET',
+    		beforeSend: function() {
+        	// TODO: show your spinner
+        	$('#ajaxSpinner').show();
+    	},
+    		complete: function() {
+        		// TODO: hide your spinner
+        		$('#ajaxSpinner').hide();
+    		},
+    		success: function(data) {
+    			console.log(data);
+		        //var htmldata;
+		        var products = data.products;
+		        $("#CountDiv").show();
+		        $("#count").html(products.length);
+		        var data = [];
+		        var dataOne = {};
+		    	for(var i = 0  ; i<products.length; i++){
+		    		/*htmldata += "<tr>";
+		    			htmldata += "<td>"+products[i].title+"</td>";
+		    			htmldata += "<td>"+products[i].variants[0].price+"</td>";
+		    			htmldata += "</td>";
+		    		htmldata += "</tr>";*/
+		    		if(products[i].title){
+			    		var title = products[i].title;
+			    		title = title.replace(/(\r\n|\n|\r|")/gm,'');   			
+			    		title = JSON.stringify(title);
+		    		}else{
+		    			var title = JSON.stringify("n/a");
+		    		}
+		    		if(products[i].body_html){
+			    		var description = products[i].body_html;
+			    		var description = "<div>"+products[i].body_html+"</div>";
+			    		description = $.parseHTML(description);
+			    		description = description[0].innerText;
+			    		description = description.replace(/(\r\n|\n|\r|")/gm,"");
+			    		description = JSON.stringify(description);		    			
+		    		}else{
+		    			var description = JSON.stringify("n/a");
+		    		}
+		    		
+		    		if(products[i].images.length != 0){
+			    		if(products[i].images[0].src){
+				    		var image = products[i].images[0].src;
+				    		image = "<span><img width='200px' src="+image+" /><span>";		    			
+			    		}else{
+			    			var image = "NO IMAGE";	
+			    		}		    			
+		    		}else{
+		    			var image = "NO IMAGE";	
+		    		}
+
+			    	var option = '';
+		    		if(products[i].options.length != 0){
+			    		var options = products[i].options;
+			    		for(var j=0; j<options.length;j++){
+			    			var name = products[i].options[j].name;
+			    			var value = products[i].options[j].values;
+			    			option += "<span class='label label-primary'><b>"+name+"</b> </span><span style='word-break: break-word;'>("+value+")</span>";
+			    			option = option.replace(/"<span/gm,'<span');
+			    			option = option.replace(/span>"/gm,'span>');
+			    			option = option.replace(/"/gm,'``');
+			    			option = JSON.stringify(option);
+			    			//option = option.replace(/x/gm,'*');
+			    			//option = option.replace(/"/gm,'in ');
+			    		}		    			
+		    		}else{
+		    			var option = JSON.stringify("n/a");
+		    		}
+		    		if(products[i].variants[0].sku){
+			    		var sku = products[i].variants[0].sku;		    			
+			    		sku = JSON.stringify(sku);		    			
+		    		}else{
+		    			sku = JSON.stringify("n/a");
+		    		}
+		    		//console.log(i);
+		    		//console.log(sku);
+					if(products[i].product_type){
+			    		var product_type = products[i].product_type;		    			
+			    		product_type = JSON.stringify(product_type);		    			
+		    		}else{
+		    			var product_type = JSON.stringify("n/a");
+		    		}
+		    		if(products[i].vendor){
+			    		var vendor = products[i].vendor;		    			
+			    		vendor = JSON.stringify(vendor);		    			
+		    		}else{
+		    			var vendor = JSON.stringify("n/a");
+		    		}
+		    		dataOne = '{"name":'+title+', "price":"$'+products[i].variants[0].price+'" , "product_type":'+product_type+', "options":'+option+', "stock":'+sku+', "vendor":'+vendor+', "created_at":"'+products[i].created_at+'", "description":'+description+', "image":"'+image+'" }';
+		    		data[i] = JSON.parse(dataOne);
+		    	}
+		    	data = JSON.stringify(data);
+		    	data = JSON.parse(data);
+		    	//console.log('final data', data);
+		    	$('.dtr-data').css('wrap');
+		    	
+	    		//$("#pData").html(htmldata);
+	    		    $('#example').DataTable( {
+				    	"data": data,
+				        //"ajax": data,
+				        "columns": [
+				            { "data": "name" },
+				            { "data": "product_type" },
+				            { "data": "price" },
+					        { "data": "options" },
+					        { "data": "stock" },
+					        { "data": "vendor" },
+			            	{ "data": "created_at" },
+				            { "data": "description" },
+				            { "data": "image" },
+				            /*{ "data": "salary" },
+				            { "data": "position" }*/
+				        ],
+				        responsive: {
+				            details: {
+				                display: $.fn.dataTable.Responsive.display.modal( {
+				                    header: function ( row ) {
+				                        var data = row.data();
+				                        return 'Details for '+data[0]+' '+data[1];
+				                    }
+				                } ),
+				                renderer: $.fn.dataTable.Responsive.renderer.tableAll( {
+				                    tableClass: 'ui table'
+				                } )
+				            }
+				        },
+				        language: {
+					        infoEmpty: "No records available - Got it?",
+					    }
+				    } );
+
+    		},
+		    error: function (xhr, ajaxOptions, thrownError) {
+		    	 $("#count").html('0');
+		    	alert(products);
+		    }
+		});
+		
+	}	
+	
+	//Extracting domain parts from a given url
+	function parseURL(url){
+	    parsed_url = {}
+	    if ( url == null || url.length == 0 )
+	        return parsed_url;
+
+	    protocol_i = url.indexOf('://');
+	    parsed_url.protocol = url.substr(0,protocol_i);
+
+	    remaining_url = url.substr(protocol_i + 3, url.length);
+	    domain_i = remaining_url.indexOf('/');
+	    domain_i = domain_i == -1 ? remaining_url.length - 1 : domain_i;
+	    parsed_url.domain = remaining_url.substr(0, domain_i);
+	    parsed_url.path = domain_i == -1 || domain_i + 1 == remaining_url.length ? null : remaining_url.substr(domain_i + 1, remaining_url.length);
+
+	    domain_parts = parsed_url.domain.split('.');
+	    switch ( domain_parts.length ){
+	        case 2:
+	          parsed_url.subdomain = null;
+	          parsed_url.host = domain_parts[0];
+	          parsed_url.tld = domain_parts[1];
+	          break;
+	        case 3:
+	          parsed_url.subdomain = domain_parts[0];
+	          parsed_url.host = domain_parts[1];
+	          parsed_url.tld = domain_parts[2];
+	          break;
+	        case 4:
+	          parsed_url.subdomain = domain_parts[0];
+	          parsed_url.host = domain_parts[1];
+	          parsed_url.tld = domain_parts[2] + '.' + domain_parts[3];
+	          break;
+	    }
+	    parsed_url.parent_domain = parsed_url.host + '.' + parsed_url.tld;
+	    return parsed_url;
+	}
+	
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
