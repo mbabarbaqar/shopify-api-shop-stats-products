@@ -1,5 +1,7 @@
 # shopify-api-shop-stats-products
 Detect Shopify websites, list products, calculate stats and ranking. Prepared for browser extensions.
+[Demo Page](https://apps.easylearnweb.com/shopify-app/shopify_extention.html)
+
 ## Shopify App Features ##
 * Enter url for any shopify website.
 * Detect shopify websites.
